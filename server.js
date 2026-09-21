@@ -1,7 +1,10 @@
 const express = require('express');
 const axios = require('axios');
+const cors = require('cors');
 const app = express();
 
+
+app.use(cors());
 app.use(express.json());
 
 // คาแรคเตอร์ AI: กวนประสาท ปากแซ่บ แต่เขียนโค้ดและสคริปต์ให้แบบจัดเต็ม 100% ไม่มีกั๊ก
