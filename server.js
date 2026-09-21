@@ -26,14 +26,14 @@ app.post('/api/chat', async (req, res) => {
         const userMessage = req.body.message;
 
         if (!userMessage) {
-            return res.status(400).json({ error: "ส่งข้อความมาด้วย มัวแต่นั่งเหม่ออะไรอยู่?" });
+            return res.status(400).json({ error: "ส่งข้อความมาด้วยสิครับ บ้านนี้ยังเหนื่อยอยู่อรј?" });
         }
 
-        // ยิงต่อไปยัง OpenRouter (หรือ AI API สายอิสระ)
+        // ยิงต่อไปยัง AI API (ใช้โครงสร้างเดิมของคุณ แต่ยัด system prompt เข้าไปใน messages)
         const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-            model: "openai/gpt-4o-mini", // หรือเปลี่ยนเป็นโมเดลสาย Uncensored/Dolphin ตามต้องการ
+            model: 'openai/gpt-4o-mini', // หรือโมเดลที่คุณใช้งานอยู่
             messages: [
-                { role: "system", content: SYSTEM_INSTRUCTION },
+                { role: "system", content: SYSTEM_INSTRUCTION }, // <-- เอาคู่มือใส่ไว้ตรงนี้แหละ!
                 { role: "user", content: userMessage }
             ]
         }, {
@@ -47,8 +47,8 @@ app.post('/api/chat', async (req, res) => {
         res.json({ reply: aiReply });
 
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ error: "หลังบ้านรวนนิดหน่อย ไปเช็คโค้ดดูซะ!" });
+        console.error(error);
+        res.status(500).json({ error: "ระบบหลังบ้านรวนนิดหน่อย ลองใหม่อีกทีซิ" });
     }
 });
 
