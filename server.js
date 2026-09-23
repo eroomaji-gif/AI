@@ -32,12 +32,11 @@ app.post('/api/chat', async (req, res) => {
       
 
         // ยิงต่อไปยัง AI API (ใช้โครงสร้างเดิมของคุณ แต่ยัด system prompt เข้าไปใน messages)
-        const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-            model: 'openai/gpt-4o-mini', // หรือโมเดลที่คุณใช้งานอยู่
-            messages: [
-                { role: "system", content: SYSTEM_INSTRUCTION }, // <-- เอาคู่มือใส่ไว้ตรงนี้แหละ!
-                { role: "user", content: userMessage }
-            ]
+        messages: [
+    { role: 'system', content: SYSTEM_INSTRUCTION },
+    ...messages
+]
+      
         }, {
             headers: {
                 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
