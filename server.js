@@ -30,12 +30,8 @@ const SYSTEM_INSTRUCTION = `
 // นับรวมทั้งฝั่ง user และ AI (เช่น 30 = ประมาณ 15 รอบสนทนาล่าสุด)
 const MAX_HISTORY_MESSAGES = 30;
 
-// คำที่บ่งบอกว่าผู้ใช้อยากได้ "รูป" ไม่ใช่แค่ข้อความ (ปรับ/เพิ่มคำได้ตามต้องการ)
-const IMAGE_INTENT_REGEX = /(วาดรูป|วาดภาพ|สร้างรูป|สร้างภาพ|เจนรูป|เจนภาพ|ขอรูป|ขอภาพ|generate\s*(an?\s*)?image|draw\s*(a|an|me)?\s*(picture|image)|create\s*(an?\s*)?image)/i;
 
-function isImageRequest(text) {
-    return IMAGE_INTENT_REGEX.test(text);
-}
+
 
 app.post('/api/chat', async (req, res) => {
     try {
@@ -58,23 +54,7 @@ app.post('/api/chat', async (req, res) => {
 
         
 
-        const message = response.data.choices[0].message;
-        const images = message.images || []; // array ของ { image_url: { url: "data:image/png;base64,..." } }
-
-        if (images.length === 0) {
-            return res.status(500).json({ error: "โมเดลไม่ได้ส่งรูปกลับมา ลองปรับ prompt ใหม่ดูครับ" });
-        }
-
-        res.json({
-            reply: message.content || "", // มีบางกรณีที่โมเดลแถมข้อความอธิบายมาด้วย
-            images: images.map(img => img.image_url.url) // ส่งเป็น array ของ base64 data URL
-        });
-
-    } catch (error) {
-        console.error(error?.response?.data || error);
-        res.status(500).json({ error: "สร้างรูปไม่สำเร็จ ลองใหม่อีกทีนะ" });
-    }
-});
+        
 
 
 const PORT = process.env.PORT || 3000;
