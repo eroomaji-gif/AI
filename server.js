@@ -61,37 +61,7 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// Endpoint สำหรับสร้างรูปภาพผ่าน OpenRouter Image API
-app.post('/api/generate-image', async (req, res) => {
-    try {
-        const { prompt } = req.body;
 
-        if (!prompt) {
-            return res.status(400).json({ error: "กรุณาระบุคำสั่งสำหรับสร้างรูปภาพ" });
-        }
-
-        // เรียกใช้งาน OpenRouter Image Generation API 
-        const response = await axios.post('https://openrouter.ai/api/v1/images', {
-            model: 'google/gemini-3.1-flash-image', // เลือกโมเดลสร้างรูปภาพที่รองรับ
-            prompt: prompt
-        }, {
-            headers: {
-                'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        // ดึงผลลัพธ์ภาพที่ได้ (OpenRouter Image API รองรับการคืนค่าแบบ base64 หรือ URL)
-        const imageData = response.data;
-        
-        // ส่งผลลัพธ์กลับไปให้ฝั่งหน้าบ้าน
-        res.json(imageData);
-
-    } catch (error) {
-        console.error("Image Generation Error:", error.response?.data || error.message);
-        res.status(500).json({ error: "ไม่สามารถสร้างรูปภาพได้ในขณะนี้ ลองใหม่อีกที" });
-    }
-});
 
         
 
