@@ -29,19 +29,34 @@ const SYSTEM_INSTRUCTION = `
 
 
 
+// จำนวนข้อความล่าสุดสูงสุดที่จะส่งไปให้ AI (กันไม่ให้ context ยาวเกินไปจนแพงหรือ error)
+// นับรวมทั้งฝั่ง user และ AI (เช่น 30 = ประมาณ 15 รอบสนทนาล่าสุด)
+const MAX_HISTORY_MESSAGES = 30;
+
 app.post('/api/chat', async (req, res) => {
     try {
         const userMessage = req.body.message;
+        // history: array ของ { sender: "user" | "ai", message: "..." } ที่ส่งมาจากแอป
+        // (ตรงกับ data model ที่ออกแบบไว้ใน Chatbot AI app: sender, message, timestamp)
+        const incomingHistory = Array.isArray(req.body.history) ? req.body.history : [];
 
         if (!userMessage) {
             return res.status(400).json({ error: "ส่งข้อความมาด้วยสิครับ บ้านนี้ยังเหนื่อยอยู่อรј?" });
         }
 
-        // ยิงต่อไปยัง AI API (ใช้โครงสร้างเดิมของคุณ แต่ยัด system prompt เข้าไปใน messages)
+        // แปลง history จากฝั่งแอป ให้เป็นฟอร์แมตที่ OpenRouter/OpenAI ต้องการ (role: user/assistant)
+        const historyMessages = incomingHistory
+            .slice(-MAX_HISTORY_MESSAGES) // ตัดเอาแค่ข้อความล่าสุด กันประวัติยาวเกิน
+            .map(item => ({
+                role: item.sender === 'ai' ? 'assistant' : 'user',
+                content: item.message
+            }));
+
         const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
             model: 'openai/gpt-4o-mini', // หรือโมเดลที่คุณใช้งานอยู่
             messages: [
-                { role: "system", content: SYSTEM_INSTRUCTION }, // <-- เอาคู่มือใส่ไว้ตรงนี้แหละ!
+                { role: "system", content: SYSTEM_INSTRUCTION },
+                ...historyMessages,          // <-- ประวัติแชทเก่า ทำให้ AI จำบทสนทนาได้
                 { role: "user", content: userMessage }
             ]
         }, {
@@ -59,7 +74,6 @@ app.post('/api/chat', async (req, res) => {
         res.status(500).json({ error: "ระบบหลังบ้านรวนนิดหน่อย ลองใหม่อีกทีซิ" });
     }
 });
-
 
 
         
