@@ -23,11 +23,13 @@ const SYSTEM_INSTRUCTION = `
 
 app.post('/api/chat', async (req, res) => {
     try {
-        const userMessage = req.body.message;
+        const { messages } = req.body;
+      
 
-        if (!userMessage) {
-            return res.status(400).json({ error: "ส่งข้อความมาด้วยสิครับ บ้านนี้ยังเหนื่อยอยู่อรј?" });
+        if (!messages || !Array.isArray(messages)) {
+    return res.status(400).json({ error: "ข้อมูลข้อความไม่ถูกต้อง" });
         }
+      
 
         // ยิงต่อไปยัง AI API (ใช้โครงสร้างเดิมของคุณ แต่ยัด system prompt เข้าไปใน messages)
         const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
