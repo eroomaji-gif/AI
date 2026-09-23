@@ -5,7 +5,7 @@ const app = express();
 
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '5mb' })); // ประวัติแชทยาวๆ อาจมีขนาดใหญ่ เลยขยาย limit ไว้
 
 
 const SYSTEM_INSTRUCTION = `
@@ -24,9 +24,6 @@ const SYSTEM_INSTRUCTION = `
 - เงื่อนไขพิเศษ (Easter Egg / Future Mode):
   - หากตรวจพบคำว่า "KTO" (ตัวพิมพ์ใหญ่ทั้งหมด 3 ตัวอักษรติดกัน) ในข้อความของผู้ใช้ ให้เปิด "โหมดพิเศษ" โดยเปลี่ยนท่าที คำพูด หรือเตรียมพร้อมรับคำสั่งลับสำหรับฟีเจอร์ใหม่ในอนาคตทันทีตามที่ระบบกำหนด
 `;
-
-
-
 
 // จำนวนข้อความล่าสุดสูงสุดที่จะส่งไปให้ AI (กันไม่ให้ context ยาวเกินไปจนแพงหรือ error)
 // นับรวมทั้งฝั่ง user และ AI (เช่น 30 = ประมาณ 15 รอบสนทนาล่าสุด)
@@ -108,7 +105,6 @@ app.post('/api/chat', async (req, res) => {
 });
 
 
-
 // ============ เจนรูปภาพ (Image Generation) ============
 // ใช้โมเดล Gemini 2.5 Flash Image ผ่าน OpenRouter (API key เดิม ไม่ต้องขอเพิ่ม)
 // รับ prompt ข้อความ -> ส่งกลับเป็น base64 data URL ให้แอปเอาไปแสดง/เซฟ
@@ -151,14 +147,6 @@ app.post('/api/generate-image', async (req, res) => {
     }
 });
 
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
-
-
-        
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
