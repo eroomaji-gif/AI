@@ -109,6 +109,53 @@ app.post('/api/chat', async (req, res) => {
 
 
 
+// ============ เจนรูปภาพ (Image Generation) ============
+// ใช้โมเดล Gemini 2.5 Flash Image ผ่าน OpenRouter (API key เดิม ไม่ต้องขอเพิ่ม)
+// รับ prompt ข้อความ -> ส่งกลับเป็น base64 data URL ให้แอปเอาไปแสดง/เซฟ
+app.post('/api/generate-image', async (req, res) => {
+    try {
+        const prompt = req.body.prompt;
+
+        if (!prompt) {
+            return res.status(400).json({ error: "ส่ง prompt สำหรับสร้างรูปมาด้วยครับ" });
+        }
+
+        const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+            model: 'google/gemini-2.5-flash-image-preview', // ตัด :free ออกถ้าอยากได้ quota แยกจากฟรีเทียร์
+            messages: [
+                { role: "user", content: prompt }
+            ],
+            modalities: ["image", "text"] // <-- บอก OpenRouter ว่าขอทั้งรูปและข้อความกลับมา
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const message = response.data.choices[0].message;
+        const images = message.images || []; // array ของ { image_url: { url: "data:image/png;base64,..." } }
+
+        if (images.length === 0) {
+            return res.status(500).json({ error: "โมเดลไม่ได้ส่งรูปกลับมา ลองปรับ prompt ใหม่ดูครับ" });
+        }
+
+        res.json({
+            reply: message.content || "", // มีบางกรณีที่โมเดลแถมข้อความอธิบายมาด้วย
+            images: images.map(img => img.image_url.url) // ส่งเป็น array ของ base64 data URL
+        });
+
+    } catch (error) {
+        console.error(error?.response?.data || error);
+        res.status(500).json({ error: "สร้างรูปไม่สำเร็จ ลองใหม่อีกทีนะ" });
+    }
+});
+
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
 
 
         
