@@ -28,10 +28,16 @@ const SYSTEM_INSTRUCTION = `
 
 
 
-
 // จำนวนข้อความล่าสุดสูงสุดที่จะส่งไปให้ AI (กันไม่ให้ context ยาวเกินไปจนแพงหรือ error)
 // นับรวมทั้งฝั่ง user และ AI (เช่น 30 = ประมาณ 15 รอบสนทนาล่าสุด)
 const MAX_HISTORY_MESSAGES = 30;
+
+// คำที่บ่งบอกว่าผู้ใช้อยากได้ "รูป" ไม่ใช่แค่ข้อความ (ปรับ/เพิ่มคำได้ตามต้องการ)
+const IMAGE_INTENT_REGEX = /(วาดรูป|วาดภาพ|สร้างรูป|สร้างภาพ|เจนรูป|เจนภาพ|ขอรูป|ขอภาพ|generate\s*(an?\s*)?image|draw\s*(a|an|me)?\s*(picture|image)|create\s*(an?\s*)?image)/i;
+
+function isImageRequest(text) {
+    return IMAGE_INTENT_REGEX.test(text);
+}
 
 app.post('/api/chat', async (req, res) => {
     try {
@@ -52,6 +58,32 @@ app.post('/api/chat', async (req, res) => {
                 content: item.message
             }));
 
+        // ----- ถ้าเข้าข่าย "ขอให้วาดรูป" ให้สลับไปใช้โมเดลเจนรูป แล้วตอบกลับพร้อมรูปเลย -----
+        if (isImageRequest(userMessage)) {
+            const imageResponse = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+                model: 'google/gemini-2.5-flash-image-preview',
+                messages: [
+                    ...historyMessages,      // ส่งประวัติไปด้วย เผื่อเป็นการขอแก้ไขรูปที่คุยกันก่อนหน้า
+                    { role: "user", content: userMessage }
+                ],
+                modalities: ["image", "text"]
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const imgMessage = imageResponse.data.choices[0].message;
+            const images = (imgMessage.images || []).map(img => img.image_url.url);
+
+            return res.json({
+                reply: imgMessage.content || "นี่ครับ รูปที่วาดให้ 🎨",
+                images // array ของ base64 data URL, ว่างได้ถ้าโมเดลไม่ส่งรูปมา
+            });
+        }
+
+        // ----- ไม่งั้นก็คุยแชทปกติ -----
         const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
             model: 'openai/gpt-4o-mini', // หรือโมเดลที่คุณใช้งานอยู่
             messages: [
@@ -70,10 +102,13 @@ app.post('/api/chat', async (req, res) => {
         res.json({ reply: aiReply });
 
     } catch (error) {
-        console.error(error);
+        console.error(error?.response?.data || error);
         res.status(500).json({ error: "ระบบหลังบ้านรวนนิดหน่อย ลองใหม่อีกทีซิ" });
     }
 });
+
+
+
 
 
         
