@@ -31,20 +31,19 @@ const SYSTEM_INSTRUCTION = `
 
 app.post('/api/chat', async (req, res) => {
     try {
-        const { messages } = req.body;
+        const userMessage = req.body.message;
 
-        if (!messages || !Array.isArray(messages)) {
-            return res.status(400).json({ error: "ข้อมูลข้อความไม่ถูกต้อง" });
+        if (!userMessage) {
+            return res.status(400).json({ error: "ส่งข้อความมาด้วยสิครับ บ้านนี้ยังเหนื่อยอยู่อรј?" });
         }
 
-        const apiMessages = [
-            { role: 'system', content: SYSTEM_INSTRUCTION },
-            ...messages
-        ];
-
+        // ยิงต่อไปยัง AI API (ใช้โครงสร้างเดิมของคุณ แต่ยัด system prompt เข้าไปใน messages)
         const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-            model: 'openai/gpt-4o-mini',
-            messages: apiMessages,
+            model: 'openai/gpt-4o-mini', // หรือโมเดลที่คุณใช้งานอยู่
+            messages: [
+                { role: "system", content: SYSTEM_INSTRUCTION }, // <-- เอาคู่มือใส่ไว้ตรงนี้แหละ!
+                { role: "user", content: userMessage }
+            ]
         }, {
             headers: {
                 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
