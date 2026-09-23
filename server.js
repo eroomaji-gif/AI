@@ -61,7 +61,7 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// ตัวอย่าง Endpoint สำหรับสร้างรูปภาพ (รองรับคำสั่งผู้ใช้)
+// Endpoint สำหรับสร้างรูปภาพผ่าน OpenRouter Image API
 app.post('/api/generate-image', async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -70,12 +70,10 @@ app.post('/api/generate-image', async (req, res) => {
             return res.status(400).json({ error: "กรุณาระบุคำสั่งสำหรับสร้างรูปภาพ" });
         }
 
-        // ตัวอย่างการเรียกใช้งาน API สำหรับสร้างรูปภาพ (สามารถปรับเปลี่ยนEndpoint ตามโมเดลที่ใช้งานผ่าน OpenRouter หรือ Provider อื่นๆ ได้)
-        const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-            model: 'openai/dall-e-3', // หรือเลือกโมเดลสร้างภาพที่ OpenRouter รองรับ
-            prompt: prompt,
-            n: 1,
-            size: "1024x1024"
+        // เรียกใช้งาน OpenRouter Image Generation API 
+        const response = await axios.post('https://openrouter.ai/api/v1/images', {
+            model: 'google/gemini-3.1-flash-image', // เลือกโมเดลสร้างรูปภาพที่รองรับ
+            prompt: prompt
         }, {
             headers: {
                 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
@@ -83,11 +81,14 @@ app.post('/api/generate-image', async (req, res) => {
             }
         });
 
-        const imageUrl = response.data.data[0].url;
-        res.json({ imageUrl: imageUrl });
+        // ดึงผลลัพธ์ภาพที่ได้ (OpenRouter Image API รองรับการคืนค่าแบบ base64 หรือ URL)
+        const imageData = response.data;
+        
+        // ส่งผลลัพธ์กลับไปให้ฝั่งหน้าบ้าน
+        res.json(imageData);
 
     } catch (error) {
-        console.error("Image Generation Error:", error);
+        console.error("Image Generation Error:", error.response?.data || error.message);
         res.status(500).json({ error: "ไม่สามารถสร้างรูปภาพได้ในขณะนี้ ลองใหม่อีกที" });
     }
 });
