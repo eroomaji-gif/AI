@@ -14,7 +14,7 @@ const { createClient } = require('@supabase/supabase-js');
 const SUPABASE_URL = 'https://ztkqtvdllpzjsvlqxzni.supabase.co';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY; // service_role (ห้ามเอาไปใส่ในหน้าเว็บ)
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_BkDeJmZYwMys8OP4eMkpVQ_F6hrJ35t';
-const AI_API_KEY = process.env.AI_API_KEY;                     // คีย์ Gemini
+const AI_API_KEY = 'ใส่รหัสคีย์_Gemini_ของมึงตรงนี้';
 const AI_MODEL = process.env.AI_MODEL || 'gemini-2.5-flash';
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';      // ใส่โดเมนเว็บจริงเมื่อขึ้นใช้งาน
 
