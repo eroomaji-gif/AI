@@ -17,7 +17,7 @@ const AI_MODEL = process.env.AI_MODEL || 'gemini-2.5-flash';
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';      // ใส่โดเมนเว็บจริงเมื่อขึ้นใช้งาน
 
 const DIVIDE_BY = Number(process.env.DIVIDE_BY || 2);                          // แต้มที่ AI อ่านได้ ÷ ตัวนี้
-const MAX_POINTS_PER_IMAGE = Number(process.env.MAX_POINTS_PER_IMAGE || 100000); // เพดานแต้มต่อรูป
+const MAX_POINTS_PER_IMAGE = Number(process.env.MAX_POINTS_PER_IMAGE || 100); // เพดานแต้มต่อรูป
 const DAILY_LIMIT = Number(process.env.DAILY_LIMIT || 20);                     // ส่งได้กี่รูปต่อวันต่อคน
 const MIN_CONFIDENCE = Number(process.env.MIN_CONFIDENCE || 0.85);             // AI ต้องมั่นใจอย่างน้อยเท่านี้
 const COOLDOWN_MS = 10 * 1000;                                                 // ห่างกันอย่างน้อย 10 วินาที
