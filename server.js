@@ -13,7 +13,7 @@ const { createClient } = require('@supabase/supabase-js');
 const SUPABASE_URL = process.env.SUPABASE_URL;                 // เช่น https://xxxx.supabase.co
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY; // service_role key (ห้ามเอาไปใส่ในหน้าเว็บ)
 const AI_API_KEY = process.env.AI_API_KEY;                     // คีย์ API ของ AI
-const AI_MODEL = process.env.AI_MODEL || 'claude-sonnet-5-5';  // ชื่อโมเดล AI ที่ใช้อ่านรูป
+const AI_MODEL = process.env.AI_MODEL || 'gemini-2.5-flash';  // ชื่อโมเดล AI ที่ใช้อ่านรูป
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';      // โดเมนเว็บของคุณ (ตอนทดสอบใช้ * ได้)
 
 // 📍 ตัวหารแต้ม: แต้มที่ AI อ่านได้ ÷ ตัวนี้ = แต้มที่ได้จริง (ตอนนี้หาร 2)
