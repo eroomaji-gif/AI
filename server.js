@@ -11,6 +11,7 @@ const { createClient } = require('@supabase/supabase-js');
 // 🔑 ค่าตั้งต่าง ๆ (ใส่ใน Render > Environment ห้ามเขียนคีย์ลงในโค้ด)
 // ---------------------------------------------------------------------
 const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_URL = 'https://ztkqtvdllpzjsvlqxzni.supabase.co';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY; // service_role (ห้ามเอาไปใส่ในหน้าเว็บ)
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_BkDeJmZYwMys8OP4eMkpVQ_F6hrJ35t';
 const AI_API_KEY = process.env.AI_API_KEY;                     // คีย์ Gemini
